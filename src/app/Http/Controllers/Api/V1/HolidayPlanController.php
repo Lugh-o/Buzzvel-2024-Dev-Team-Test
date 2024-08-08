@@ -9,6 +9,7 @@ use App\Http\Resources\V1\HolidayPlanCollection;
 use App\Http\Resources\V1\HolidayPlanResource;
 use App\Models\HolidayPlan;
 use App\Models\Participant;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class HolidayPlanController extends Controller
 {
@@ -20,7 +21,6 @@ class HolidayPlanController extends Controller
     public function index()
     {
         $holidayPlans = HolidayPlan::with('participants')->get();
-
         return new HolidayPlanCollection($holidayPlans);
     }
 
@@ -31,10 +31,9 @@ class HolidayPlanController extends Controller
      */
     public function show(HolidayPlan $holidayPlan)
     {
-        // Carregar os participantes relacionados
+        // Load the related participants
         $holidayPlan->load('participants');
 
-        // Retornar o recurso formatado
         return new HolidayPlanResource($holidayPlan);
     }
 
@@ -60,7 +59,6 @@ class HolidayPlanController extends Controller
                 return array_intersect_key($participant, array_flip(['name']));
             });
         
-
         // Create the Holiday Plans
         $holidayPlan = HolidayPlan::create([
             'title' => $filteredData['title'],
@@ -77,11 +75,9 @@ class HolidayPlanController extends Controller
         // Load the participants relationship
         $holidayPlan->load('participants');
         
-        //return the formatted holiday plan
         return new HolidayPlanResource($holidayPlan);
     }
-
-    
+ 
     /**
      * Update the specified holiday plan.
      *
@@ -137,13 +133,32 @@ class HolidayPlanController extends Controller
         // Load the participants relationship
         $holidayPlan->load('participants');
 
-        // Return the formatted holiday plan
         return new HolidayPlanResource($holidayPlan);
     }
 
+    /**
+     * Delete a holiday plan
+     * @param \App\Models\HolidayPlan $holidayPlan
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
     public function destroy(HolidayPlan $holidayPlan)
     {
         $holidayPlan->delete();
         return response()->json(null, 204);
+    }
+
+    /**
+     * Trigger PDF generation and download for a specific holiday plan
+     * @param mixed $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getPdf($id){
+
+        $holidayPlan = HolidayPlan::with('participants')->findOrFail($id);
+        $holidayPlanResource = new HolidayPlanResource($holidayPlan);
+                
+        $pdf = Pdf::loadView('holidayplanspdf', ['holidayplan' => $holidayPlanResource]);
+    
+        return $pdf->download('holidayplan.pdf');
     }
 }

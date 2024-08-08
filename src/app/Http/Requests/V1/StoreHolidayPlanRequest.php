@@ -3,7 +3,6 @@
 namespace App\Http\Requests\V1;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreHolidayPlanRequest extends FormRequest
 {
@@ -12,7 +11,7 @@ class StoreHolidayPlanRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
