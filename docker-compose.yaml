@@ -13,16 +13,15 @@ services:
 
   db:
     container_name: mysql
-    image: mysql
+    image: mysql:latest
     ports:
       - "3306:3306"
     volumes:
       - ./mysql/data:/var/lib/mysql
     environment:
-      - DB_DATABASE=vacation_plans_api
-      - DB_USERNAME=root
-      - DB_PASSWORD=root
-    
+      - MYSQL_DATABASE=vacation_plan_api
+      - MYSQL_ROOT_PASSWORD=root
+
   phpmyadmin:
     container_name: phpmyadmin
     image: phpmyadmin/phpmyadmin
@@ -33,7 +32,7 @@ services:
 
   vacation_plan_api:
     container_name: vacation_plan_api
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     volumes:
