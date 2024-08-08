@@ -20,8 +20,16 @@ class HolidayPlanController extends Controller
      */
     public function index()
     {
-        $holidayPlans = HolidayPlan::with('participants')->get();
-        return new HolidayPlanCollection($holidayPlans);
+        try
+        {
+            $holidayPlans = HolidayPlan::with('participants')->get();
+            return new HolidayPlanCollection($holidayPlans);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
     }
 
     /**
