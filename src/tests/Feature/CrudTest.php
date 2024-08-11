@@ -192,7 +192,7 @@ class CrudTest extends TestCase
             'Accept' => 'application/json'
         ])->delete('/api/v1/holidayPlans/1');
 
-        $response->assertStatus(204);
+        $response->assertStatus(200);
     }
 
     public function test_get_holiday_plan_pdf(){
@@ -220,6 +220,5 @@ class CrudTest extends TestCase
 
         $response->assertStatus(404);
     }
-
 
 }

@@ -10,163 +10,314 @@ use App\Http\Resources\V1\HolidayPlanResource;
 use App\Models\HolidayPlan;
 use App\Models\Participant;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
+
+/**
+ * @OA\Info(
+ *      version="1.0.0",
+ *      title="Holiday Plan API",
+ *      description="API documentation for the Holiday Plan app",
+ *      @OA\Contact(
+ *          email="lughfalcao@gmail.com"
+ *      )
+ * )
+ *
+ * @OA\PathItem(
+ *     path="/api/v1"
+ * )
+ */
 
 class HolidayPlanController extends Controller
 {
-    
     /**
-     * Retrieve all holiday plans
-     * @return HolidayPlanCollection
+     * @OA\Get(
+     *      path="/api/v1/holidayplans",
+     *      operationId="getHolidayPlansList",
+     *      tags={"Holiday Plans"},
+     *      summary="Get list of holiday plans",
+     *      description="Return a list of all Holiday Plans",
+     *      @OA\Response(
+     *          response=200,
+     *          description="OK",
+     *          @OA\JsonContent(
+     *              type="array",
+     *              @OA\Items(ref="#/components/schemas/HolidayPlan")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal Server Error"
+     *      )
+     * )
      */
     public function index()
     {
-        try
-        {
+        try {
             $holidayPlans = HolidayPlan::with('participants')->get();
             return new HolidayPlanCollection($holidayPlans);
         } catch (\Throwable $th) {
             return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
+                'error' => $th->getMessage()
             ], 500);
         }
     }
 
     /**
-     * Retrieve a specific holiday plan by ID
-     * @param \App\Models\HolidayPlan $holidayPlan
-     * @return HolidayPlanResource
+     * @OA\Get(
+     *      path="/api/v1/holidayplans/{id}",
+     *      operationId="getHolidayPlanById",
+     *      tags={"Holiday Plans"},
+     *      summary="Get specific holiday plan",
+     *      description="Retrieve a specific holiday plan by ID",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Holiday Plan ID",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="OK",
+     *          @OA\JsonContent(ref="#/components/schemas/HolidayPlan")
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Holiday Plan not found"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal Server Error"
+     *      )
+     * )
      */
-    public function show(HolidayPlan $holidayPlan)
+    public function show($id)
     {
-        // Load the related participants
-        $holidayPlan->load('participants');
-
-        return new HolidayPlanResource($holidayPlan);
+        try {
+            $holidayPlan = HolidayPlan::with('participants')->findOrFail($id);
+            return new HolidayPlanResource($holidayPlan);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Holiday Plan not found'
+            ], 404);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ], 500);
+        }
     }
 
     /**
-     * Create a new holiday plan
-     * @param \App\Http\Requests\V1\StoreHolidayPlanRequest $request
-     * @return mixed|\Illuminate\Http\JsonResponse
+     * @OA\Post(
+     *      path="/api/v1/holidayplans",
+     *      operationId="storeHolidayPlan",
+     *      tags={"Holiday Plans"},
+     *      summary="Create new holiday plan",
+     *      description="Create a new holiday plan",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/StoreHolidayPlanRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Created",
+     *          @OA\JsonContent(ref="#/components/schemas/HolidayPlan")
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal Server Error"
+     *      )
+     * )
      */
     public function store(StoreHolidayPlanRequest $request)
     {
-        // Filter the Holiday Plan
-        $filteredData = $request->only([
-            'title',
-            'description',
-            'date',
-            'location',
-            'participants'
-        ]);
+        $filteredData = $this->filterHolidayPlanData($request);
 
-        // Filter the Participants
-        $filteredParticipants = collect($filteredData['participants'] ?? [])
-            ->map(function ($participant) {
-                return array_intersect_key($participant, array_flip(['name']));
-            });
-        
-        // Create the Holiday Plans
-        $holidayPlan = HolidayPlan::create([
-            'title' => $filteredData['title'],
-            'description' => $filteredData['description'],
-            'date' => $filteredData['date'],
-            'location' => $filteredData['location']
-        ]);
-        
-        // Create the participants and associate them with the Holiday Plan
-        foreach ($filteredParticipants as $participant) {
-            $holidayPlan->participants()->create($participant);
+        try {
+            $holidayPlan = HolidayPlan::create($filteredData['holidayPlan']);
+            $this->syncParticipants($holidayPlan, $filteredData['participants']);
+
+            return new HolidayPlanResource($holidayPlan->load('participants'));
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ], 500);        
         }
-
-        // Load the participants relationship
-        $holidayPlan->load('participants');
-        
-        return new HolidayPlanResource($holidayPlan);
     }
  
     /**
-     * Update the specified holiday plan.
-     *
-     * @param \App\Http\Requests\V1\UpdateHolidayPlanRequest $request
-     * @param \App\Models\HolidayPlan $holidayPlan
-     * @return mixed|\Illuminate\Http\JsonResponse
+     * @OA\Put(
+     *      path="/api/v1/holidayplans/{id}",
+     *      operationId="updateHolidayPlan",
+     *      tags={"Holiday Plans"},
+     *      summary="Update a holiday plan",
+     *      description="Update an existing holiday plan",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Holiday Plan ID",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/UpdateHolidayPlanRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="OK",
+     *          @OA\JsonContent(ref="#/components/schemas/HolidayPlan")
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Holiday Plan not found"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal Server Error"
+     *      )
+     * )
      */
     public function update(UpdateHolidayPlanRequest $request, HolidayPlan $holidayPlan)
     {
-        // Filter the Holiday Plan
-        $filteredData = $request->only([
-            'title',
-            'description',
-            'date',
-            'location',
-            'participants'
-        ]);
+        $filteredData = $this->filterHolidayPlanData($request);
 
-        // Filter the Participants
-        $filteredParticipants = collect($filteredData['participants'] ?? [])
-            ->map(function ($participant) {
-                return array_intersect_key($participant, array_flip(['name']));
-            });
-
-        // Update the Holiday Plan
-        $holidayPlan->update([
-            'title' => $filteredData['title'],
-            'description' => $filteredData['description'],
-            'date' => $filteredData['date'],
-            'location' => $filteredData['location']
-        ]);
-
-        // Update or create participants
-        $currentParticipantIds = $holidayPlan->participants->pluck('id')->toArray();
-        $updatedParticipantIds = collect($filteredParticipants)->pluck('id')->toArray();
-
-        // Delete participants that are not in the updated list
-        $participantsToDelete = array_diff($currentParticipantIds, $updatedParticipantIds);
-        Participant::whereIn('id', $participantsToDelete)->delete();
-
-        // Update existing participants and create new ones
-        foreach ($filteredParticipants as $participant) {
-            if (isset($participant['id']) && in_array($participant['id'], $currentParticipantIds)) {
-                // Update existing participant
-                $existingParticipant = Participant::find($participant['id']);
-                $existingParticipant->update($participant);
-            } else {
-                // Create new participant
-                $holidayPlan->participants()->create($participant);
-            }
+        try {
+            $holidayPlan->update($filteredData['holidayPlan']);
+            $this->syncParticipants($holidayPlan, $filteredData['participants']);
+            return new HolidayPlanResource($holidayPlan->load('participants'));
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ], 500);          
         }
-
-        // Load the participants relationship
-        $holidayPlan->load('participants');
-
-        return new HolidayPlanResource($holidayPlan);
     }
 
     /**
-     * Delete a holiday plan
-     * @param \App\Models\HolidayPlan $holidayPlan
-     * @return mixed|\Illuminate\Http\JsonResponse
+     * @OA\Delete(
+     *      path="/api/v1/holidayplans/{id}",
+     *      operationId="deleteHolidayPlan",
+     *      tags={"Holiday Plans"},
+     *      summary="Delete a holiday plan",
+     *      description="Delete a specific holiday plan by ID",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Holiday Plan ID",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Holiday Plan deleted successfully",
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Holiday Plan not found"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal Server Error"
+     *      )
+     * )
      */
     public function destroy(HolidayPlan $holidayPlan)
     {
-        $holidayPlan->delete();
-        return response()->json(null, 204);
+        try {
+            $holidayPlan->delete();
+            return response()->json([
+                'message' => 'Holiday Plan deleted successfully'
+            ], 200);          
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ], 500);          
+        }
     }
 
     /**
-     * Trigger PDF generation and download for a specific holiday plan
-     * @param mixed $id
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *      path="/api/v1/holidayplans/{id}/pdf",
+     *      operationId="getHolidayPlanPdf",
+     *      tags={"Holiday Plans"},
+     *      summary="Generate PDF for a holiday plan",
+     *      description="Trigger PDF generation and download for a specific holiday plan",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Holiday Plan ID",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="PDF generated successfully",
+     *          @OA\MediaType(
+     *              mediaType="application/pdf",
+     *              @OA\Schema(type="string", format="binary")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Holiday Plan not found"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Internal Server Error"
+     *      )
+     * )
      */
-    public function getPdf($id){
+    public function getPdf($id)
+    {
+        try {
+            $holidayPlan = HolidayPlan::with('participants')->findOrFail($id);
+            $pdf = Pdf::loadView('holidayplanspdf', ['holidayplan' => new HolidayPlanResource($holidayPlan)]);
+            return $pdf->download('holidayplan.pdf');
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Holiday Plan not found'
+            ], 404);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ], 500);
+        }
+    }
 
-        $holidayPlan = HolidayPlan::with('participants')->findOrFail($id);
-        $holidayPlanResource = new HolidayPlanResource($holidayPlan);
-                
-        $pdf = Pdf::loadView('holidayplanspdf', ['holidayplan' => $holidayPlanResource]);
-    
-        return $pdf->download('holidayplan.pdf');
+    /**
+     * Filter holiday plan and participants data from the request
+     * @param Request $request
+     * @return array
+     */
+    private function filterHolidayPlanData(Request $request)
+    {
+        $data = $request->only(['title', 'description', 'date', 'location', 'participants']);
+        $participants = collect($data['participants'] ?? [])->map(fn($p) => array_intersect_key($p, array_flip(['name'])));
+        return ['holidayPlan' => $data, 'participants' => $participants];
+    }
+
+    /**
+     * Sync participants with the holiday plan
+     * @param HolidayPlan $holidayPlan
+     * @param \Illuminate\Support\Collection $participants
+     */
+    private function syncParticipants(HolidayPlan $holidayPlan, $participants)
+    {
+        $currentParticipantIds = $holidayPlan->participants->pluck('id')->toArray();
+        $updatedParticipantIds = $participants->pluck('id')->toArray();
+
+        // Delete participants not in the updated list
+        $participantsToDelete = array_diff($currentParticipantIds, $updatedParticipantIds);
+        Participant::whereIn('id', $participantsToDelete)->delete();
+
+        // Update or create participants
+        foreach ($participants as $participant) {
+            if (isset($participant['id']) && in_array($participant['id'], $currentParticipantIds)) {
+                Participant::find($participant['id'])->update($participant);
+            } else {
+                $holidayPlan->participants()->create($participant);
+            }
+        }
     }
 }

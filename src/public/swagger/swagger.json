@@ -1,0 +1,542 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Holiday Plan API",
+        "description": "API documentation for the Holiday Plan app",
+        "contact": {
+            "email": "lughfalcao@gmail.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1": {},
+        "/api/v1/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Create User",
+                "description": "Register a new user",
+                "operationId": "ad77fe138bcb384ad65d167d5c8d1cc0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User Created Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User Created Successfully"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "your_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "validation error"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login The User",
+                "description": "Login an existing user",
+                "operationId": "bae68d1c55329ecb6e41f48285840c8f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john.doe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User Logged In Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User Logged In Successfully"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "your_token_here"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid Credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Email & Password does not match with our record."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal Server Error"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/holidayplans": {
+            "get": {
+                "tags": [
+                    "Holiday Plans"
+                ],
+                "summary": "Get list of holiday plans",
+                "description": "Return a list of all Holiday Plans",
+                "operationId": "getHolidayPlansList",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/HolidayPlan"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Holiday Plans"
+                ],
+                "summary": "Create new holiday plan",
+                "description": "Create a new holiday plan",
+                "operationId": "storeHolidayPlan",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/StoreHolidayPlanRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HolidayPlan"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/holidayplans/{id}": {
+            "get": {
+                "tags": [
+                    "Holiday Plans"
+                ],
+                "summary": "Get specific holiday plan",
+                "description": "Retrieve a specific holiday plan by ID",
+                "operationId": "getHolidayPlanById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Holiday Plan ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HolidayPlan"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Holiday Plan not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Holiday Plans"
+                ],
+                "summary": "Update a holiday plan",
+                "description": "Update an existing holiday plan",
+                "operationId": "updateHolidayPlan",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Holiday Plan ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateHolidayPlanRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HolidayPlan"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Holiday Plan not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Holiday Plans"
+                ],
+                "summary": "Delete a holiday plan",
+                "description": "Delete a specific holiday plan by ID",
+                "operationId": "deleteHolidayPlan",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Holiday Plan ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Holiday Plan deleted successfully"
+                    },
+                    "404": {
+                        "description": "Holiday Plan not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/holidayplans/{id}/pdf": {
+            "get": {
+                "tags": [
+                    "Holiday Plans"
+                ],
+                "summary": "Generate PDF for a holiday plan",
+                "description": "Trigger PDF generation and download for a specific holiday plan",
+                "operationId": "getHolidayPlanPdf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Holiday Plan ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "PDF generated successfully",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Holiday Plan not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "HolidayPlan": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "location": {
+                        "type": "string"
+                    },
+                    "participants": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Participant"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "Participant": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "StoreHolidayPlanRequest": {
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "location": {
+                        "type": "string"
+                    },
+                    "participants": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateHolidayPlanRequest": {
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "location": {
+                        "type": "string"
+                    },
+                    "participants": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            }
+        }
+    }
+}

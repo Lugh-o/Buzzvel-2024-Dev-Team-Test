@@ -14,12 +14,10 @@ class AuthTest extends TestCase
     public function test_user_register_with_valid_credentials()
     { 
 
-        $this->withoutMiddleware();
-
         $credentials = [
             "name" => "testName",
             "email" => "test@email.com",
-            "password" => "testPassword"
+            "password" => "testPassword",
         ];
 
         $response = $this->post('/register', $credentials);
@@ -35,8 +33,6 @@ class AuthTest extends TestCase
 
     public function test_user_register_that_already_exists()
     { 
-
-        $this->withoutMiddleware();
 
         $credentials = [
             "name" => "testName",
@@ -56,8 +52,6 @@ class AuthTest extends TestCase
     public function test_user_register_with_missing_fields()
     { 
 
-        $this->withoutMiddleware();
-
         $credentials = [ //name missing
             "email" => "test@email.com",
             "password" => "testPassword"
@@ -70,8 +64,6 @@ class AuthTest extends TestCase
 
     public function test_user_register_with_invalid_value()
     { 
-
-        $this->withoutMiddleware();
 
         $credentials = [ 
             "name" => "testName",
@@ -86,7 +78,6 @@ class AuthTest extends TestCase
 
     public function test_user_login_with_valid_credentials()
     {
-        $this->withoutMiddleware();
 
         User::create([
             "name" => "testName",
@@ -113,7 +104,6 @@ class AuthTest extends TestCase
 
     public function test_user_login_with_invalid_credentials()
     {
-        $this->withoutMiddleware();
 
         User::create([
             "name" => "testName",
@@ -133,7 +123,6 @@ class AuthTest extends TestCase
 
     public function test_user_login_with_missing_fields()
     {
-        $this->withoutMiddleware();
 
         User::create([
             "name" => "testName",
