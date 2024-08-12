@@ -7,13 +7,13 @@ info:
   version: 1.0.0
 paths:
   /api/v1: {  }
-  /api/v1/register:
+  /register:
     post:
       tags:
         - Authentication
       summary: 'Create User'
       description: 'Register a new user'
-      operationId: ad77fe138bcb384ad65d167d5c8d1cc0
+      operationId: e6d1fcf1feab4f92eacb72353c6dfbcd
       requestBody:
         required: true
         content:
@@ -33,7 +33,7 @@ paths:
                   example: john.doe@example.com
                 password:
                   type: string
-                  example: password123
+                  example: P@ssword123
               type: object
       responses:
         '200':
@@ -65,13 +65,13 @@ paths:
                   status: { type: boolean, example: false }
                   message: { type: string, example: 'Internal Server Error' }
                 type: object
-  /api/v1/login:
+  /login:
     post:
       tags:
         - Authentication
       summary: 'Login The User'
       description: 'Login an existing user'
-      operationId: bae68d1c55329ecb6e41f48285840c8f
+      operationId: 72bf786ad8ff53c7391309c836350a8d
       requestBody:
         required: true
         content:
@@ -87,7 +87,7 @@ paths:
                   example: john.doe@example.com
                 password:
                   type: string
-                  example: password123
+                  example: P@ssword123
               type: object
       responses:
         '200':
@@ -136,6 +136,9 @@ paths:
                   $ref: '#/components/schemas/HolidayPlan'
         '500':
           description: 'Internal Server Error'
+      security:
+        -
+          sanctum: []
     post:
       tags:
         - 'Holiday Plans'
@@ -157,6 +160,9 @@ paths:
                 $ref: '#/components/schemas/HolidayPlan'
         '500':
           description: 'Internal Server Error'
+      security:
+        -
+          sanctum: []
   '/api/v1/holidayplans/{id}':
     get:
       tags:
@@ -183,6 +189,9 @@ paths:
           description: 'Holiday Plan not found'
         '500':
           description: 'Internal Server Error'
+      security:
+        -
+          sanctum: []
     put:
       tags:
         - 'Holiday Plans'
@@ -214,6 +223,9 @@ paths:
           description: 'Holiday Plan not found'
         '500':
           description: 'Internal Server Error'
+      security:
+        -
+          sanctum: []
     delete:
       tags:
         - 'Holiday Plans'
@@ -235,6 +247,9 @@ paths:
           description: 'Holiday Plan not found'
         '500':
           description: 'Internal Server Error'
+      security:
+        -
+          sanctum: []
   '/api/v1/holidayplans/{id}/pdf':
     get:
       tags:
@@ -262,6 +277,9 @@ paths:
           description: 'Holiday Plan not found'
         '500':
           description: 'Internal Server Error'
+      security:
+        -
+          sanctum: []
 components:
   schemas:
     HolidayPlan:
@@ -327,3 +345,9 @@ components:
                 type: string
             type: object
       type: object
+  securitySchemes:
+    sanctum:
+      type: apiKey
+      description: 'Please provide your Bearer token in the Authorization header.'
+      name: Authorization
+      in: header

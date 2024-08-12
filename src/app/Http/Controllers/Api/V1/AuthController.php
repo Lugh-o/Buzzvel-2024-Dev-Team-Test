@@ -14,7 +14,7 @@ class AuthController extends Controller
 {
         /**
      * @OA\Post(
-     *     path="/api/v1/register",
+     *     path="/register",
      *     tags={"Authentication"},
      *     summary="Create User",
      *     description="Register a new user",
@@ -24,7 +24,7 @@ class AuthController extends Controller
      *             required={"name", "email", "password"},
      *             @OA\Property(property="name", type="string", example="John Doe"),
      *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
-     *             @OA\Property(property="password", type="string", example="password123")
+     *             @OA\Property(property="password", type="string", example="P@ssword123")
      *         )
      *     ),
      *     @OA\Response(
@@ -59,12 +59,15 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         try {
-            //Validated
             $validateUser = Validator::make($request->all(), 
             [
                 'name' => 'required',
                 'email' => 'required|email|unique:users,email',
-                'password' => 'required'
+                'password' => [
+                    'required',
+                    'min:6',
+                    'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/'
+                ]
             ]);
 
             if($validateUser->fails()){
@@ -97,7 +100,7 @@ class AuthController extends Controller
 
         /**
      * @OA\Post(
-     *     path="/api/v1/login",
+     *     path="/login",
      *     tags={"Authentication"},
      *     summary="Login The User",
      *     description="Login an existing user",
@@ -106,7 +109,7 @@ class AuthController extends Controller
      *         @OA\JsonContent(
      *             required={"email", "password"},
      *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
-     *             @OA\Property(property="password", type="string", example="password123")
+     *             @OA\Property(property="password", type="string", example="P@ssword123")
      *         )
      *     ),
      *     @OA\Response(

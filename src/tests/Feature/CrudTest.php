@@ -16,19 +16,13 @@ class CrudTest extends TestCase
         $user = User::factory()->create();
 
         $token = $user->createToken('TestToken')->plainTextToken;
+        
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->get('/api/v1/holidayPlans');
+        ])->get('/api/v1/holidayplans');
 
         $response->assertStatus(200);
     }
-
-    // public function test_get_all_holiday_plans_without_authentication(){
-
-    //     $response = $this->get('/api/v1/holidayPlans');
-
-    //     $response->assertStatus(401);
-    // }
 
     public function test_get_single_holiday_plan(){
 
@@ -37,7 +31,7 @@ class CrudTest extends TestCase
         $token = $user->createToken('TestToken')->plainTextToken;
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->get('/api/v1/holidayPlans');
+        ])->get('/api/v1/holidayplans');
 
         $response->assertStatus(200);
     }
@@ -49,7 +43,7 @@ class CrudTest extends TestCase
         $token = $user->createToken('TestToken')->plainTextToken;
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->get('/api/v1/holidayPlans/1000');
+        ])->get('/api/v1/holidayplans/1000');
 
         $response->assertStatus(404);
     }
@@ -66,7 +60,7 @@ class CrudTest extends TestCase
         $token = $user->createToken('TestToken')->plainTextToken;
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->post('/api/v1/holidayPlans', $holidayPlan);
+        ])->post('/api/v1/holidayplans', $holidayPlan);
         $response->assertStatus(201);
     }
 
@@ -84,7 +78,7 @@ class CrudTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json'
-        ])->post('/api/v1/holidayPlans', $holidayPlan);
+        ])->post('/api/v1/holidayplans', $holidayPlan);
         $response->assertStatus(422);
     }
 
@@ -107,12 +101,13 @@ class CrudTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json'
-        ])->post('/api/v1/holidayPlans', $holidayPlan);
+        ])->post('/api/v1/holidayplans', $holidayPlan);
         $response->assertStatus(422);
     }
 
     public function test_update_holiday_plan(){
         $user = User::factory()->create();
+        $token = $user->createToken('TestToken')->plainTextToken;
 
         $holidayPlan = [
             "title" => "titleUpdated",
@@ -126,12 +121,10 @@ class CrudTest extends TestCase
             ]
         ];
 
-        $token = $user->createToken('TestToken')->plainTextToken;
-
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json'
-        ])->put('/api/v1/holidayPlans/1', $holidayPlan);
+        ])->put('/api/v1/holidayplans/1', $holidayPlan);
 
         $response->assertStatus(200);
     }
@@ -152,7 +145,7 @@ class CrudTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json'
-        ])->put('/api/v1/holidayPlans/1', $holidayPlan);
+        ])->put('/api/v1/holidayplans/1', $holidayPlan);
 
         $response->assertStatus(422);
     }
@@ -177,7 +170,7 @@ class CrudTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json'
-        ])->put('/api/v1/holidayPlans/1', $holidayPlan);
+        ])->put('/api/v1/holidayplans/1', $holidayPlan);
 
         $response->assertStatus(422);
     }
@@ -190,7 +183,7 @@ class CrudTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json'
-        ])->delete('/api/v1/holidayPlans/1');
+        ])->delete('/api/v1/holidayplans/1');
 
         $response->assertStatus(200);
     }
@@ -203,7 +196,7 @@ class CrudTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json'
-        ])->get('/api/v1/holidayPlans/1/pdf');
+        ])->get('/api/v1/holidayplans/1/pdf');
 
         $response->assertStatus(200);
     }
@@ -216,7 +209,7 @@ class CrudTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json'
-        ])->get('/api/v1/holidayPlans/200/pdf');
+        ])->get('/api/v1/holidayplans/200/pdf');
 
         $response->assertStatus(404);
     }

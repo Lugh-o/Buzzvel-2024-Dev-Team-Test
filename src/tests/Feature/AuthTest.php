@@ -13,11 +13,10 @@ class AuthTest extends TestCase
 
     public function test_user_register_with_valid_credentials()
     { 
-
         $credentials = [
             "name" => "testName",
             "email" => "test@email.com",
-            "password" => "testPassword",
+            "password" => "testPassword0!",
         ];
 
         $response = $this->post('/register', $credentials);
@@ -33,11 +32,10 @@ class AuthTest extends TestCase
 
     public function test_user_register_that_already_exists()
     { 
-
         $credentials = [
             "name" => "testName",
             "email" => "test@email.com",
-            "password" => "testPassword"
+            "password" => "testPassword0!"
         ];
 
         $this->post('/register', $credentials);

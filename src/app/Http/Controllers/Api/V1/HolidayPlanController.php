@@ -22,6 +22,14 @@ use Illuminate\Http\Request;
  *          email="lughfalcao@gmail.com"
  *      )
  * )
+ * 
+ *  * @OA\SecurityScheme(
+ *     securityScheme="sanctum",
+ *     type="apiKey",
+ *     in="header",
+ *     name="Authorization",
+ *     description="Please provide your Bearer token in the Authorization header."
+ * )
  *
  * @OA\PathItem(
  *     path="/api/v1"
@@ -37,6 +45,7 @@ class HolidayPlanController extends Controller
      *      tags={"Holiday Plans"},
      *      summary="Get list of holiday plans",
      *      description="Return a list of all Holiday Plans",
+     *      security={{"sanctum": {}}},
      *      @OA\Response(
      *          response=200,
      *          description="OK",
@@ -50,6 +59,7 @@ class HolidayPlanController extends Controller
      *          description="Internal Server Error"
      *      )
      * )
+     * 
      */
     public function index()
     {
@@ -70,6 +80,7 @@ class HolidayPlanController extends Controller
      *      tags={"Holiday Plans"},
      *      summary="Get specific holiday plan",
      *      description="Retrieve a specific holiday plan by ID",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          description="Holiday Plan ID",
@@ -115,6 +126,7 @@ class HolidayPlanController extends Controller
      *      tags={"Holiday Plans"},
      *      summary="Create new holiday plan",
      *      description="Create a new holiday plan",
+     *      security={{"sanctum": {}}},
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(ref="#/components/schemas/StoreHolidayPlanRequest")
@@ -153,6 +165,7 @@ class HolidayPlanController extends Controller
      *      tags={"Holiday Plans"},
      *      summary="Update a holiday plan",
      *      description="Update an existing holiday plan",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          description="Holiday Plan ID",
@@ -179,11 +192,12 @@ class HolidayPlanController extends Controller
      *      )
      * )
      */
-    public function update(UpdateHolidayPlanRequest $request, HolidayPlan $holidayPlan)
+    public function update(UpdateHolidayPlanRequest $request, $id)
     {
-        $filteredData = $this->filterHolidayPlanData($request);
-
         try {
+            $holidayPlan = HolidayPlan::findOrFail($id);
+            $filteredData = $this->filterHolidayPlanData($request);
+    
             $holidayPlan->update($filteredData['holidayPlan']);
             $this->syncParticipants($holidayPlan, $filteredData['participants']);
             return new HolidayPlanResource($holidayPlan->load('participants'));
@@ -193,7 +207,7 @@ class HolidayPlanController extends Controller
             ], 500);          
         }
     }
-
+        
     /**
      * @OA\Delete(
      *      path="/api/v1/holidayplans/{id}",
@@ -201,6 +215,7 @@ class HolidayPlanController extends Controller
      *      tags={"Holiday Plans"},
      *      summary="Delete a holiday plan",
      *      description="Delete a specific holiday plan by ID",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          description="Holiday Plan ID",
@@ -229,10 +244,14 @@ class HolidayPlanController extends Controller
             return response()->json([
                 'message' => 'Holiday Plan deleted successfully'
             ], 200);          
+        } catch (ModelNotFoundException $th) {
+            return response()->json([
+                'error' => 'Holiday Plan not found'
+            ], 404);
         } catch (\Throwable $th) {
             return response()->json([
-                'error' => $th->getMessage()
-            ], 500);          
+                'error' => 'An error occurred while deleting the holiday plan'
+            ], 500);   
         }
     }
 
@@ -243,6 +262,7 @@ class HolidayPlanController extends Controller
      *      tags={"Holiday Plans"},
      *      summary="Generate PDF for a holiday plan",
      *      description="Trigger PDF generation and download for a specific holiday plan",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          description="Holiday Plan ID",
@@ -306,12 +326,10 @@ class HolidayPlanController extends Controller
     {
         $currentParticipantIds = $holidayPlan->participants->pluck('id')->toArray();
         $updatedParticipantIds = $participants->pluck('id')->toArray();
-
-        // Delete participants not in the updated list
+    
         $participantsToDelete = array_diff($currentParticipantIds, $updatedParticipantIds);
         Participant::whereIn('id', $participantsToDelete)->delete();
-
-        // Update or create participants
+    
         foreach ($participants as $participant) {
             if (isset($participant['id']) && in_array($participant['id'], $currentParticipantIds)) {
                 Participant::find($participant['id'])->update($participant);
@@ -320,4 +338,4 @@ class HolidayPlanController extends Controller
             }
         }
     }
-}
+    }

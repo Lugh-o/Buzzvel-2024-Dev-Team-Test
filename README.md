@@ -35,7 +35,7 @@ This is a project of a Holiday Planning API, built for the Buzzvel selective pro
 
 ### Pre-requisites
 
-- PHP ^8.2
+- PHP 8.2
 
 - Docker
 
@@ -118,5 +118,5 @@ The API documentation can be accessed through Swagger UI, which provides an inte
 ### CRSF Token Mismatch
 If you send a requisition to the API through a domain that isn't the sanctum stateful domain (configured in the .env file) you will need to send a request to the endpoint `GET /sanctum/csrf-cookie` and then include the cookie that this endpoint sent to the headers of the following requisitions. 
 ```json
-[{"key":"X-XSRF_TOKEN","value":"{{xsrf-cookie}}"]
+[{"key":"X-XSRF_TOKEN","value":"{{xsrf-cookie}}"}]
 ```

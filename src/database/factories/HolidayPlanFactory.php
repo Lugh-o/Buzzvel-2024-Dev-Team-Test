@@ -19,7 +19,7 @@ class HolidayPlanFactory extends Factory
         return [
             'title' => fake()->words(3, true),
             'description' => fake()->paragraph(),
-            'date' => fake()->date(),
+            'date' => fake()->dateTimeThisYear()->format('Y-m-d'),
             'location' => fake()->words(3, true),
         ];
     }

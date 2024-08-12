@@ -10,14 +10,14 @@
     },
     "paths": {
         "/api/v1": {},
-        "/api/v1/register": {
+        "/register": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Create User",
                 "description": "Register a new user",
-                "operationId": "ad77fe138bcb384ad65d167d5c8d1cc0",
+                "operationId": "e6d1fcf1feab4f92eacb72353c6dfbcd",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -40,7 +40,7 @@
                                     },
                                     "password": {
                                         "type": "string",
-                                        "example": "password123"
+                                        "example": "P@ssword123"
                                     }
                                 },
                                 "type": "object"
@@ -120,14 +120,14 @@
                 }
             }
         },
-        "/api/v1/login": {
+        "/login": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Login The User",
                 "description": "Login an existing user",
-                "operationId": "bae68d1c55329ecb6e41f48285840c8f",
+                "operationId": "72bf786ad8ff53c7391309c836350a8d",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -145,7 +145,7 @@
                                     },
                                     "password": {
                                         "type": "string",
-                                        "example": "password123"
+                                        "example": "P@ssword123"
                                     }
                                 },
                                 "type": "object"
@@ -246,7 +246,12 @@
                     "500": {
                         "description": "Internal Server Error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -279,7 +284,12 @@
                     "500": {
                         "description": "Internal Server Error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/api/v1/holidayplans/{id}": {
@@ -318,7 +328,12 @@
                     "500": {
                         "description": "Internal Server Error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "put": {
                 "tags": [
@@ -365,7 +380,12 @@
                     "500": {
                         "description": "Internal Server Error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -395,7 +415,12 @@
                     "500": {
                         "description": "Internal Server Error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/api/v1/holidayplans/{id}/pdf": {
@@ -435,7 +460,12 @@
                     "500": {
                         "description": "Internal Server Error"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         }
     },
@@ -536,6 +566,14 @@
                     }
                 },
                 "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "apiKey",
+                "description": "Please provide your Bearer token in the Authorization header.",
+                "name": "Authorization",
+                "in": "header"
             }
         }
     }
