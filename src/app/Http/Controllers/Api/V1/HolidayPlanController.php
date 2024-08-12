@@ -14,28 +14,10 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 /**
- * @OA\Info(
- *      version="1.0.0",
- *      title="Holiday Plan API",
- *      description="API documentation for the Holiday Plan app",
- *      @OA\Contact(
- *          email="lughfalcao@gmail.com"
- *      )
- * )
- * 
- *  * @OA\SecurityScheme(
- *     securityScheme="sanctum",
- *     type="apiKey",
- *     in="header",
- *     name="Authorization",
- *     description="Please provide your Bearer token in the Authorization header."
- * )
- *
  * @OA\PathItem(
  *     path="/api/v1"
  * )
  */
-
 class HolidayPlanController extends Controller
 {
     /**
@@ -237,24 +219,27 @@ class HolidayPlanController extends Controller
      *      )
      * )
      */
-    public function destroy(HolidayPlan $holidayPlan)
+    public function destroy($id)
     {
         try {
+            $holidayPlan = HolidayPlan::findOrFail($id);
             $holidayPlan->delete();
+    
             return response()->json([
                 'message' => 'Holiday Plan deleted successfully'
-            ], 200);          
-        } catch (ModelNotFoundException $th) {
+            ], 200);
+    
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'error' => 'Holiday Plan not found'
             ], 404);
-        } catch (\Throwable $th) {
+        } catch (\Throwable $e) {
             return response()->json([
                 'error' => 'An error occurred while deleting the holiday plan'
-            ], 500);   
+            ], 500);
         }
     }
-
+    
     /**
      * @OA\Get(
      *      path="/api/v1/holidayplans/{id}/pdf",

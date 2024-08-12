@@ -9,10 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-
 class AuthController extends Controller
 {
-        /**
+    /**
      * @OA\Post(
      *     path="/register",
      *     tags={"Authentication"},
@@ -56,49 +55,55 @@ class AuthController extends Controller
      * )
      */
 
-    public function register(Request $request)
-    {
-        try {
+     public function register(Request $request)
+     {
+         try {
             $validateUser = Validator::make($request->all(), 
             [
-                'name' => 'required',
-                'email' => 'required|email|unique:users,email',
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email|max:255',
                 'password' => [
                     'required',
-                    'min:6',
-                    'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/'
-                ]
+                    'string',
+                    'min:8',
+                    function($attribute, $value, $fail) {
+                        if (!preg_match('/[a-z]/', $value)) $fail('The password must contain at least one lowercase letter.');
+                        if (!preg_match('/[A-Z]/', $value)) $fail('The password must contain at least one uppercase letter.');
+                        if (!preg_match('/[0-9]/', $value)) $fail('The password must contain at least one digit.');
+                        if (!preg_match('/[@$!%*#?&]/', $value)) $fail('The password must contain at least one special character (@, $, !, %, *, #, ?, &).');
+                    },
+                ],
             ]);
-
-            if($validateUser->fails()){
-                return response()->json([
-                    'status' => false,
-                    'message' => 'validation error',
-                    'errors' => $validateUser->errors()
-                ], 401);
-            }
-
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password)
-            ]);
-
-            return response()->json([
-                'status' => true,
-                'message' => 'User Created Successfully',
-                'token' => $user->createToken("API TOKEN")->plainTextToken
-            ], 200);
-
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
-        }
-    }
-
-        /**
+         
+             if($validateUser->fails()){
+                 return response()->json([
+                     'status' => false,
+                     'message' => 'Validation error',
+                     'errors' => $validateUser->errors()
+                 ], 401);
+             }
+     
+             $user = User::create([
+                 'name' => $request->name,
+                 'email' => $request->email,
+                 'password' => Hash::make($request->password)
+             ]);
+     
+             return response()->json([
+                 'status' => true,
+                 'message' => 'User Created Successfully',
+                 'token' => $user->createToken("API TOKEN")->plainTextToken
+             ], 200);
+     
+         } catch (\Throwable $th) {
+             return response()->json([
+                 'status' => false,
+                 'message' => $th->getMessage()
+             ], 500);
+         }
+     }
+     
+    /**
      * @OA\Post(
      *     path="/login",
      *     tags={"Authentication"},
@@ -139,7 +144,6 @@ class AuthController extends Controller
      *     )
      * )
      */
-
     public function login(Request $request)
     {
         try {

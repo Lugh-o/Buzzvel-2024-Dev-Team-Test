@@ -1,6 +1,23 @@
 <?php
 
 /**
+ *  @OA\Info(
+ *      version="1.0.0",
+ *      title="Holiday Plan API",
+ *      description="API documentation for the Holiday Plan app",
+ *      @OA\Contact(
+ *          email="lughfalcao@gmail.com"
+ *      )
+ * )
+ * 
+ *  @OA\SecurityScheme(
+ *     securityScheme="sanctum",
+ *     type="apiKey",
+ *     in="header",
+ *     name="Authorization",
+ *     description="Please provide your Bearer token in the Authorization header."
+ * )
+ *
  * @OA\Schema(
  *     schema="HolidayPlan",
  *     type="object",

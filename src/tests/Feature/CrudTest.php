@@ -4,12 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\HolidayPlan;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\TestCase;
 
-class CrudTest extends TestCase
+class CrudTest extends FeatureTest
 {
-    use DatabaseTransactions;
 
     public function test_get_all_holiday_plans(){
 
@@ -31,7 +28,7 @@ class CrudTest extends TestCase
         $token = $user->createToken('TestToken')->plainTextToken;
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->get('/api/v1/holidayplans');
+        ])->get('/api/v1/holidayplans/1');
 
         $response->assertStatus(200);
     }

@@ -28,6 +28,17 @@
         plugins: [
           SwaggerUIBundle.plugins.DownloadUrl
         ],
+        requestInterceptor: (req) => {
+            req.headers['Authorization'] = 'Bearer ' + req.headers['Authorization'];
+            const csrfCookie = document.cookie.split('; ').find(row => row.startsWith('XSRF-TOKEN='));
+            if (csrfCookie) {
+                const csrfToken = csrfCookie.split('=')[1];
+                req.headers['X-XSRF-TOKEN'] = decodeURIComponent(csrfToken);
+            }
+            
+            return req;
+        },
+
         layout: "StandaloneLayout"
       })
       window.ui = ui

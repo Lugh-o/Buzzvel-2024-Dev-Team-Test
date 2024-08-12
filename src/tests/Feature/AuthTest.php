@@ -3,13 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
-use Tests\TestCase;
 
-class AuthTest extends TestCase
+class AuthTest extends FeatureTest
 {
-    use DatabaseTransactions;
 
     public function test_user_register_with_valid_credentials()
     { 
