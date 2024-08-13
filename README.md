@@ -33,12 +33,12 @@ cp ./src/.env.example ./src/.env; cd src; composer install; cd ../
 
 Create the docker container:
 ```
-docker-compose --env-file src/.env up --build
+docker compose --env-file src/.env up --build -d
 ```
 
 Database migrations:
 ```
-docker exec -t app php artisan migrate
+docker exec -t app php artisan migrate:fresh
 ```
 
 If you wish to seed the database with dummy data for testing:
