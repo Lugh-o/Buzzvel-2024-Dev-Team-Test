@@ -26,19 +26,19 @@ This is a project of a Holiday Planning API, built for the Buzzvel selective pro
 
 After clonning the repository, run the following commands on its root:
 
-Create a .env file based on the .env.example:
+Create a .env file based on the .env.example and install the dependencies:
 ```
-cp ./src/.env.example ./src/.env
+cp ./src/.env.example ./src/.env; cd src; composer install; cd ../
 ```
 
 Create the docker container:
 ```
-docker-compose --env-file src/.env up --build
+docker compose --env-file src/.env up --build -d
 ```
 
 Database migrations:
 ```
-docker exec -t app php artisan migrate
+docker exec -t app php artisan migrate:fresh
 ```
 
 If you wish to seed the database with dummy data for testing:
@@ -54,6 +54,14 @@ docker exec -t app php artisan test
 ## Swagger Documentation
 
 The API documentation can be accessed through Swagger UI, which provides an interactive way to explore and test the API endpoints. To view the documentation access: `http://localhost:8080/swagger`
+
+## phpMyAdmin
+To access the database access: `http://localhost:8081`
+The default credentials are:
+```
+username: root
+password: root
+```
 
 ## **Endpoints**
  **Base URL**: `http://localhost:8080/api`
