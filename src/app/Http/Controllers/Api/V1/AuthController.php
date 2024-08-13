@@ -13,7 +13,7 @@ class AuthController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/register",
+     *     path="/api/register",
      *     tags={"Authentication"},
      *     summary="Create User",
      *     description="Register a new user",
@@ -36,11 +36,11 @@ class AuthController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=401,
+     *         response=422,
      *         description="Validation Error",
      *         @OA\JsonContent(
      *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="validation error"),
+     *             @OA\Property(property="message", type="string", example="Validation Error"),
      *             @OA\Property(property="errors", type="object", additionalProperties=true)
      *         )
      *     ),
@@ -54,7 +54,6 @@ class AuthController extends Controller
      *     )
      * )
      */
-
      public function register(Request $request)
      {
          try {
@@ -80,7 +79,7 @@ class AuthController extends Controller
                      'status' => false,
                      'message' => 'Validation error',
                      'errors' => $validateUser->errors()
-                 ], 401);
+                 ], 422);
              }
      
              $user = User::create([
@@ -105,7 +104,7 @@ class AuthController extends Controller
      
     /**
      * @OA\Post(
-     *     path="/login",
+     *     path="/api/login",
      *     tags={"Authentication"},
      *     summary="Login The User",
      *     description="Login an existing user",

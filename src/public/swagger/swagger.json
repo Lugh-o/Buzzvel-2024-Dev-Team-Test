@@ -2,22 +2,21 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Holiday Plan API",
-        "description": "API documentation for the Holiday Plan app",
+        "description": "API documentation for the Holiday Plan app.",
         "contact": {
             "email": "lughfalcao@gmail.com"
         },
         "version": "1.0.0"
     },
     "paths": {
-        "/api/v1": {},
-        "/register": {
+        "/api/register": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Create User",
                 "description": "Register a new user",
-                "operationId": "e6d1fcf1feab4f92eacb72353c6dfbcd",
+                "operationId": "d6f5d00c40f9de2e9272088aebe648c8",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -73,7 +72,7 @@
                             }
                         }
                     },
-                    "401": {
+                    "422": {
                         "description": "Validation Error",
                         "content": {
                             "application/json": {
@@ -85,7 +84,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "validation error"
+                                            "example": "Validation Error"
                                         },
                                         "errors": {
                                             "type": "object",
@@ -120,14 +119,14 @@
                 }
             }
         },
-        "/login": {
+        "/api/login": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "Login The User",
                 "description": "Login an existing user",
-                "operationId": "72bf786ad8ff53c7391309c836350a8d",
+                "operationId": "0f5784f47a3fcac35f86ec4e82d967d7",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -237,7 +236,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/HolidayPlan"
+                                        "$ref": "#/components/schemas/HolidayPlanCollection"
                                     }
                                 }
                             }
@@ -245,6 +244,9 @@
                     },
                     "500": {
                         "description": "Internal Server Error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 },
                 "security": [
@@ -276,13 +278,21 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/HolidayPlan"
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/HolidayPlan"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 },
                 "security": [
@@ -317,7 +327,12 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/HolidayPlan"
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/HolidayPlan"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -327,6 +342,9 @@
                     },
                     "500": {
                         "description": "Internal Server Error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 },
                 "security": [
@@ -369,7 +387,12 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/HolidayPlan"
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/HolidayPlan"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -379,6 +402,9 @@
                     },
                     "500": {
                         "description": "Internal Server Error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 },
                 "security": [
@@ -414,6 +440,9 @@
                     },
                     "500": {
                         "description": "Internal Server Error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 },
                 "security": [
@@ -459,6 +488,9 @@
                     },
                     "500": {
                         "description": "Internal Server Error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
                 },
                 "security": [
@@ -562,6 +594,17 @@
                                 }
                             },
                             "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "HolidayPlanCollection": {
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/HolidayPlan"
                         }
                     }
                 },

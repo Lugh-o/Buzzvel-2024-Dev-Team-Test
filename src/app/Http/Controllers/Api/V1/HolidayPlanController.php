@@ -13,11 +13,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
-/**
- * @OA\PathItem(
- *     path="/api/v1"
- * )
- */
 class HolidayPlanController extends Controller
 {
     /**
@@ -33,21 +28,26 @@ class HolidayPlanController extends Controller
      *          description="OK",
      *          @OA\JsonContent(
      *              type="array",
-     *              @OA\Items(ref="#/components/schemas/HolidayPlan")
+     *              @OA\Items(ref="#/components/schemas/HolidayPlanCollection")
      *          )
      *      ),
      *      @OA\Response(
      *          response=500,
      *          description="Internal Server Error"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
      *      )
      * )
-     * 
      */
     public function index()
     {
         try {
             $holidayPlans = HolidayPlan::with('participants')->get();
-            return new HolidayPlanCollection($holidayPlans);
+            return response()->json([
+                'data' => new HolidayPlanCollection($holidayPlans)
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'error' => $th->getMessage()
@@ -73,7 +73,13 @@ class HolidayPlanController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="OK",
-     *          @OA\JsonContent(ref="#/components/schemas/HolidayPlan")
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="data",
+     *                  ref="#/components/schemas/HolidayPlan"
+     *              )
+     *          )
      *      ),
      *      @OA\Response(
      *          response=404,
@@ -82,6 +88,10 @@ class HolidayPlanController extends Controller
      *      @OA\Response(
      *          response=500,
      *          description="Internal Server Error"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
      *      )
      * )
      */
@@ -89,7 +99,9 @@ class HolidayPlanController extends Controller
     {
         try {
             $holidayPlan = HolidayPlan::with('participants')->findOrFail($id);
-            return new HolidayPlanResource($holidayPlan);
+            return response()->json([
+                'data' => new HolidayPlanResource($holidayPlan)
+            ], 200);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'error' => 'Holiday Plan not found'
@@ -116,11 +128,21 @@ class HolidayPlanController extends Controller
      *      @OA\Response(
      *          response=201,
      *          description="Created",
-     *          @OA\JsonContent(ref="#/components/schemas/HolidayPlan")
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="data",
+     *                  ref="#/components/schemas/HolidayPlan"
+     *              )
+     *          )
      *      ),
      *      @OA\Response(
      *          response=500,
      *          description="Internal Server Error"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
      *      )
      * )
      */
@@ -132,7 +154,9 @@ class HolidayPlanController extends Controller
             $holidayPlan = HolidayPlan::create($filteredData['holidayPlan']);
             $this->syncParticipants($holidayPlan, $filteredData['participants']);
 
-            return new HolidayPlanResource($holidayPlan->load('participants'));
+            return response()->json([
+                'data' => new HolidayPlanResource($holidayPlan->load('participants'))
+            ], 201);
         } catch (\Throwable $th) {
             return response()->json([
                 'error' => $th->getMessage()
@@ -162,7 +186,13 @@ class HolidayPlanController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="OK",
-     *          @OA\JsonContent(ref="#/components/schemas/HolidayPlan")
+     *          @OA\JsonContent(
+     *              type="object",
+     *              @OA\Property(
+     *                  property="data",
+     *                  ref="#/components/schemas/HolidayPlan"
+     *              )
+     *          )
      *      ),
      *      @OA\Response(
      *          response=404,
@@ -171,6 +201,10 @@ class HolidayPlanController extends Controller
      *      @OA\Response(
      *          response=500,
      *          description="Internal Server Error"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
      *      )
      * )
      */
@@ -182,7 +216,10 @@ class HolidayPlanController extends Controller
     
             $holidayPlan->update($filteredData['holidayPlan']);
             $this->syncParticipants($holidayPlan, $filteredData['participants']);
-            return new HolidayPlanResource($holidayPlan->load('participants'));
+
+            return response()->json([
+                'data' => new HolidayPlanResource($holidayPlan->load('participants'))
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'error' => $th->getMessage()
@@ -216,6 +253,10 @@ class HolidayPlanController extends Controller
      *      @OA\Response(
      *          response=500,
      *          description="Internal Server Error"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
      *      )
      * )
      */
@@ -270,6 +311,10 @@ class HolidayPlanController extends Controller
      *      @OA\Response(
      *          response=500,
      *          description="Internal Server Error"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthorized"
      *      )
      * )
      */

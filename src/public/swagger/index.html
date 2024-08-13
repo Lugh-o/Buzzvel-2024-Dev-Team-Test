@@ -35,7 +35,6 @@
                 const csrfToken = csrfCookie.split('=')[1];
                 req.headers['X-XSRF-TOKEN'] = decodeURIComponent(csrfToken);
             }
-            
             return req;
         },
 

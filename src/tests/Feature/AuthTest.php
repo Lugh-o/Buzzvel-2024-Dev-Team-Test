@@ -16,7 +16,7 @@ class AuthTest extends FeatureTest
             "password" => "testPassword0!",
         ];
 
-        $response = $this->post('/register', $credentials);
+        $response = $this->post('/api/register', $credentials);
         
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -35,10 +35,10 @@ class AuthTest extends FeatureTest
             "password" => "testPassword0!"
         ];
 
-        $this->post('/register', $credentials);
-        $response = $this->post('/register', $credentials);
+        $this->post('/api/register', $credentials);
+        $response = $this->post('/api/register', $credentials);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
         $this->assertDatabaseHas('users', [
             'email' => 'test@email.com'
         ]);
@@ -52,9 +52,9 @@ class AuthTest extends FeatureTest
             "password" => "testPassword"
         ];
 
-        $response = $this->post('/register', $credentials);
+        $response = $this->post('/api/register', $credentials);
         
-        $response->assertStatus(401);
+        $response->assertStatus(422);
     }
 
     public function test_user_register_with_invalid_value()
@@ -66,9 +66,9 @@ class AuthTest extends FeatureTest
             "password" => "testPassword"
         ];
 
-        $response = $this->post('/register', $credentials);
+        $response = $this->post('/api/register', $credentials);
         
-        $response->assertStatus(401);
+        $response->assertStatus(422);
     }
 
     public function test_user_login_with_valid_credentials()
@@ -85,7 +85,7 @@ class AuthTest extends FeatureTest
             "password" => "testPassword"
         ];
 
-        $response = $this->post('/login', $credentials);
+        $response = $this->post('/api/login', $credentials);
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
@@ -111,7 +111,7 @@ class AuthTest extends FeatureTest
             "password" => "testPassword"
         ];
 
-        $response = $this->post('/login', $credentials);
+        $response = $this->post('/api/login', $credentials);
 
         $response->assertStatus(401);
     }
@@ -129,7 +129,7 @@ class AuthTest extends FeatureTest
             "email" => "invalidEmail"
         ];
 
-        $response = $this->post('/login', $credentials);
+        $response = $this->post('/api/login', $credentials);
 
         $response->assertStatus(401);
     }
