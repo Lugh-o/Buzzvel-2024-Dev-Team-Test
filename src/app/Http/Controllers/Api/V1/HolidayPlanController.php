@@ -220,6 +220,10 @@ class HolidayPlanController extends Controller
             return response()->json([
                 'data' => new HolidayPlanResource($holidayPlan->load('participants'))
             ], 200);
+        }  catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Holiday Plan not found'
+            ], 404);
         } catch (\Throwable $th) {
             return response()->json([
                 'error' => $th->getMessage()
