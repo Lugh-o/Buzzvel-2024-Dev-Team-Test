@@ -10,6 +10,8 @@ use App\Http\Resources\V1\HolidayPlanResource;
 use App\Models\HolidayPlan;
 use App\Models\Participant;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use DateTime;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
@@ -151,9 +153,18 @@ class HolidayPlanController extends Controller
         $filteredData = $this->filterHolidayPlanData($request);
 
         try {
+            $inputDate = Carbon::createFromFormat('Y-m-d', $filteredData['holidayPlan']['date']);
+            $currentDate = Carbon::today();
+        
+            if (!$inputDate->greaterThan($currentDate)){
+                return response()->json([
+                    'error' => "A data do evento deve ser após o dia de hoje"
+                ], 422);
+            }
+            
             $holidayPlan = HolidayPlan::create($filteredData['holidayPlan']);
-            $this->syncParticipants($holidayPlan, $filteredData['participants']);
 
+            $this->syncParticipants($holidayPlan, $filteredData['participants']);
             return response()->json([
                 'data' => new HolidayPlanResource($holidayPlan->load('participants'))
             ], 201);
@@ -249,6 +260,10 @@ class HolidayPlanController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="Holiday Plan deleted successfully",
+     *          @OA\JsonContent(
+     *              type="array",
+     *              @OA\Items()
+     *          )
      *      ),
      *      @OA\Response(
      *          response=404,
@@ -303,9 +318,9 @@ class HolidayPlanController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="PDF generated successfully",
-     *          @OA\MediaType(
-     *              mediaType="application/pdf",
-     *              @OA\Schema(type="string", format="binary")
+     *          @OA\JsonContent(
+     *              type="array",
+     *              @OA\Items()
      *          )
      *      ),
      *      @OA\Response(

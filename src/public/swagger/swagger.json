@@ -433,7 +433,15 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Holiday Plan deleted successfully"
+                        "description": "Holiday Plan deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {}
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Holiday Plan not found"
@@ -475,10 +483,10 @@
                     "200": {
                         "description": "PDF generated successfully",
                         "content": {
-                            "application/pdf": {
+                            "application/json": {
                                 "schema": {
-                                    "type": "string",
-                                    "format": "binary"
+                                    "type": "array",
+                                    "items": {}
                                 }
                             }
                         }

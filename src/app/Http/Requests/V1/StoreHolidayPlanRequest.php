@@ -24,7 +24,7 @@ class StoreHolidayPlanRequest extends FormRequest
         return [
             'title' => ['required', 'string'],
             'description' => ['required', 'string'],
-            'date' => ['required', 'date'],
+            'date' => ['required', 'date', 'after:today'],
             'location' => ['required', 'string'],
             'participants' => ['required', 'array'],
             'participants.*.name' => ['required', 'string']
